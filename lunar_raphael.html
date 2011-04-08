@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html><head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <script src="lunar_raphael_files/raphael.js"></script> 
+    <script src = "http://code.jquery.com/jquery-1.5.js"></script>
+  <script src="lunar_raphael_files/insult.js" type="text/javascript"></script> 
+  <style type="text/css">
+    /*give the body height:100% so that its child
+      elements can have percentage heights*/
+      body
+      { 
+        height:100% ;
+        background-color: #000;
+      }
+
+  </style>
+  <title>Lunar Lander</title>
+</head>
+<body style="overflow: hidden;">
+  
+  <div id="drawme" class="fullscreen"><svg height="600" width="1000" version="1.1" xmlns="http://www.w3.org/2000/svg"><desc>Created with Raphaël</desc><defs><linearGradient y2="0" x2="6.123233995736766e-17" y1="1" x1="0" id="r-c968f397824b49618859e073635ab640"><stop stop-color="#ff3300" offset="0%"></stop><stop stop-color="#ffff33" offset="100%"></stop></linearGradient></defs><path stroke-width="8" style="stroke-width: 8;" d="M0,515.846934087124L2.9280570012628626,598.8253936112982" stroke="#ffffff" fill="none"></path><path stroke-width="8" style="stroke-width: 8;" d="M2.9280570012628626,598.8253936112982L31.20928993010097,525.5885989442536" stroke="#ffffff" fill="none"></path><path stroke-width="8" style="stroke-width: 8;" d="M31.20928993010097,525.5885989442536L62.56674041385857,343.4604473294177" stroke="#ffffff" fill="none"></path><path stroke-width="8" style="stroke-width: 8;" d="M62.56674041385857,343.4604473294177L134.15048285656195,526.3820729122958" stroke="#ffffff" fill="none"></path><path stroke-width="8" style="stroke-width: 8;" d="M134.15048285656195,526.3820729122958L135.11910651923088,436.13470265974286" stroke="#ffffff" fill="none"></path><path stroke-width="8" style="stroke-width: 8;" d="M135.11910651923088,436.13470265974286L140.18970393306506,590.4618723394583" stroke="#ffffff" fill="none"></path><path stroke-width="8" style="stroke-width: 8;" d="M140.18970393306506,590.4618723394583L159.704440061467,541.3710972258651" stroke="#ffffff" fill="none"></path><path stroke-width="8" style="stroke-width: 8;" d="M159.704440061467,541.3710972258651L167.00311192132068,563.740220851516" stroke="#ffffff" fill="none"></path><path stroke-width="8" style="stroke-width: 8;" d="M167.00311192132068,563.740220851516L183.42253504469153,533.5283067305403" stroke="#ffffff" fill="none"></path><path stroke-width="8" style="stroke-width: 8;" d="M183.42253504469153,533.5283067305403L253.08868213282054,426.643176468963" stroke="#ffffff" fill="none"></path><path stroke-width="8" style="stroke-width: 8;" d="M253.08868213282054,426.643176468963L300.0187312202183,310.04093691742185" stroke="#ffffff" fill="none"></path><path stroke-width="8" style="stroke-width: 8;" d="M300.0187312202183,310.04093691742185L365.12760843190154,369.1021968313593" stroke="#ffffff" fill="none"></path><path stroke-width="8" style="stroke-width: 8;" d="M365.12760843190154,369.1021968313593L425.12760843190154,369.1021968313593" stroke="#f52887" fill="none"></path><path stroke-width="8" style="stroke-width: 8;" d="M425.12760843190154,369.1021968313593L548.9287741971802,406.3876295114989" stroke="#ffffff" fill="none"></path><path stroke-width="8" style="stroke-width: 8;" d="M548.9287741971802,406.3876295114989L589.7805795817917,581.1200500367877" stroke="#ffffff" fill="none"></path><path stroke-width="8" style="stroke-width: 8;" d="M589.7805795817917,581.1200500367877L650.2681427847953,554.4543407410224" stroke="#ffffff" fill="none"></path><path stroke-width="8" style="stroke-width: 8;" d="M650.2681427847953,554.4543407410224L805.8021503480148,458.46414412268587" stroke="#ffffff" fill="none"></path><path stroke-width="8" style="stroke-width: 8;" d="M805.8021503480148,458.46414412268587L820.3454066884256,299.6628067295963" stroke="#ffffff" fill="none"></path><path stroke-width="8" style="stroke-width: 8;" d="M820.3454066884256,299.6628067295963L855.1072653778605,493.420769210602" stroke="#ffffff" fill="none"></path><path stroke-width="8" style="stroke-width: 8;" d="M855.1072653778605,493.420769210602L988.9250298113164,281.76549927994756" stroke="#ffffff" fill="none"></path><path stroke-width="8" style="stroke-width: 8;" d="M988.9250298113164,281.76549927994756L1000,446.2783744795548" stroke="#ffffff" fill="none"></path><path stroke-width="6" style="stroke-width: 6;" d="M881.9462583517775,-19.6L895.2795916851109,20.4L868.6129250184441,20.4Z" stroke="#ffffff" fill="#00ffff"></path><path stroke-width="2" style="opacity: 1; fill-opacity: 1; stroke-width: 2;" fill-opacity="1" opacity="1" d="M868.6129250184441,20.4L858.6129250184441,12.093453883517109L872.1696399914812,11.132854846106769L872.4654207456439,17.443163498902358L878.9004480187633,1.567464962691482L905.2795916851109,5.201645451676345L895.2795916851109,20.4Z" stroke="#ffffff" fill="url(#r-c968f397824b49618859e073635ab640)"></path></svg></div>
+  <!-- <canvas id="drawme" style="background-color: #FFFFFF;">Your browser does not support the Canvas element.</canvas> !-->
+
+  <script type="text/javascript">
+
+    // Constants
+    var SMOKE_LEN = 40;
+    var PEAK_NUM = 20;
+    var PEAK_SCALE = 0.60;
+    var MAX_WIDTH = 1000;
+    var MAX_HEIGHT = 600;
+
+    var paper = Raphael(document.getElementById("drawme"), MAX_WIDTH, MAX_HEIGHT);
+    var ship;
+	var circle;
+	var pic;
+    var ship_obj;
+    var ship_flame_obj;
+    var accelx = 0;
+    var accely = 0;
+    var terrain_pts;
+    var terrain_obj; 
+    //var h = Math.random();
+    var lz;
+
+    // Start code
+    resetEnv(); 
+    window.addEventListener("MozOrientation", handleOrientation, true);
+    window.addEventListener("deviceorientation", deviceOrientation, true);
+    setInterval( Update, 20 );
+
+    function resetEnv() {
+      paper.clear();
+      terrain_pts = []; 
+      terrain_obj = []; 
+      particles = [];
+      lz = Math.floor(Math.random()* PEAK_NUM + 1);
+
+      // Reset ship
+      ship = ( { x: Math.random() * MAX_WIDTH, 
+                 y: MAX_HEIGHT - MAX_HEIGHT *(7/8), 
+                 t_ptx: 0,
+                 t_pty: 0,
+                 r_ptx: 0,
+                 r_pty: 0,
+                 l_ptx: 0,
+                 l_pty: 0,
+                 flame_l: 0,
+                 flame_r: 0,
+                 flame_width: 0,
+                 flame_height: 0,
+                 vx: 0,
+                 vy: 0,
+                 size: 20,
+                 color: "#FFFFFF" 
+               } );
+
+
+
+      drawTerrain();
+      ship_obj = null;
+      ship_flame_obj = null;
+	  	circle = paper.circle(ship.x,ship.y,15).attr({stroke:"#FFFFFF", fill:"#00FFFF", "stroke-width":3});
+		pic = paper.image(getIcon("mreligioso"), ship.x, ship.y, 30, 30);
+    }
+
+
+    function drawShip() {
+	if(accely < 0.1) {
+        ship_flame_arr = []
+        ship.flame_l = ship.l_ptx - ship.size/2;
+        ship.flame_r = ship.r_ptx + ship.size/2;
+        ship.flame_width = ship.flame_r - ship.flame_l;
+        ship.flame_height= ship.size;
+        for (var i = 0; i < 5; i++) {
+          ship_flame_arr.push({x: Math.abs(Math.random())*ship.flame_width + ship.flame_l,
+                               y: Math.abs(Math.random())*ship.flame_height + ship.y+25});
+        }
+        ship_flame_arr.sort(function(a,b){return a.x - b.x});
+        ship_flame_path = "M" + ship.l_ptx + " " + ship.l_pty +
+                          "L" + ship.flame_l + " " + ship_flame_arr[0].y +
+                          "L" + ship_flame_arr[1].x + " " + ship_flame_arr[1].y +
+                          "L" + ship_flame_arr[2].x + " " + ship_flame_arr[2].y +
+                          "L" + ship_flame_arr[3].x + " " + ship_flame_arr[3].y +
+                          "L" + ship.flame_r + " " + ship_flame_arr[4].y +
+                          "L" + ship.r_ptx + " " + ship.r_pty + "Z";
+      if (ship_flame_obj == null) {
+        ship_flame_obj = paper.path(ship_flame_path).attr({stroke:"#FFFFFF", fill:"90-#FF3300-#FFFF33", "stroke-width":2});
+      } else {
+        ship_flame_obj.animate({path: ship_flame_path}, 10);
+      }
+
+      }
+      else {
+        ship_flame_obj.remove();
+        ship_flame_obj = null;
+      }
+      ship.t_ptx = ship.x;
+      ship.t_pty = ship.y - ship.size;
+      ship.r_ptx = ship.x + ship.size/3*2;
+      ship.r_pty = ship.y + ship.size;
+      ship.l_ptx = ship.x - ship.size/3*2;
+      ship.l_pty = ship.y + ship.size;
+	var scale =1.25;
+	  
+		ship_path = "M" + (ship.x) + " " + (ship.y-25*scale) + //body ship
+					"L" + (ship.x+10*scale) + " " + (ship.y) +
+					"L" + (ship.x+10*scale) + " " + (ship.y+25*scale) +
+					"L" + (ship.x-10*scale) + " " + (ship.y+25*scale) +
+					"L" + (ship.x-10*scale) + " " + (ship.y) + 
+					"L" + (ship.x) + " " + (ship.y-25*scale) + 
+					
+					"M" + (ship.x+5*scale) + " " + (ship.y+10*scale) + //right box
+					"L" + (ship.x+15*scale) + " " +(ship.y+10*scale) +
+					"L" + (ship.x+15*scale) + " " +(ship.y+30*scale) +
+					"L" + (ship.x+5*scale) + " " + (ship.y+30*scale) +
+					"L" + (ship.x+5*scale) + " " + (ship.y+10*scale) +
+					
+					"M" + (ship.x-5*scale) + " " +(ship.y+10*scale) + //left box 
+					"L" + (ship.x-15*scale) + " " +(ship.y+10*scale) +
+					"L" + (ship.x-15*scale) + " " +(ship.y+30*scale) +
+					"L" + (ship.x-5*scale) + " " + (ship.y+30*scale) +
+					"L" + (ship.x-5*scale) + " " + (ship.y+10*scale) +
+					
+					"M" + (ship.x-10*scale) + " " + (ship.y+10*scale) + //left wing
+					"L" + (ship.x-20*scale) + " " + (ship.y+15*scale) +
+					"L" + (ship.x-20*scale) + " " + (ship.y+20*scale) +
+					"L" + (ship.x-10*scale) + " " + (ship.y+25*scale) +
+					"L" + (ship.x-10*scale) + " " + (ship.y+10*scale) +
+					
+					"M" + (ship.x+10*scale) + " " + (ship.y+10*scale) + //right wing
+					"L" + (ship.x+20*scale) + " " + (ship.y+15*scale) +
+					"L" + (ship.x+20*scale) + " " + (ship.y+20*scale) +
+					"L" + (ship.x+10*scale) + " " + (ship.y+25*scale) +
+					"L" + (ship.x+10*scale) + " " + (ship.y+10*scale) +
+					"Z";
+
+      if (ship_obj == null) {
+		
+        ship_obj = paper.path(ship_path).attr({stroke:"#FFFFFF", fill:"#00FFFF", "stroke-width":3});
+		
+      } else {
+		circle.toFront();
+		pic.toFront();
+		pic.animate({x:ship.x-15, y:ship.y-15},1);
+        ship_obj.animate({path: ship_path}, 1);
+	    circle.animate({cx:ship.x, cy:ship.y},1);
+      }
+
+      
+    }
+
+    function drawTerrain() {
+  
+      // Generate terrain points
+      for (var i = 0; i < PEAK_NUM; i++) {
+        terrain_pts.push({x: Math.random()* MAX_WIDTH, 
+                          y: MAX_HEIGHT - Math.abs(Math.random()) * 
+                             MAX_HEIGHT*PEAK_SCALE});
+      }
+
+      // Generate endpoints
+      terrain_pts.push({x: 0, 
+                        y: MAX_HEIGHT - Math.random() * 
+                           MAX_HEIGHT*PEAK_SCALE});
+      terrain_pts.push({x: MAX_WIDTH, 
+                        y: MAX_HEIGHT - Math.random() * 
+                           MAX_HEIGHT*PEAK_SCALE});
+
+      terrain_pts.sort(function(a,b){return a.x - b.x});
+
+      //  Create lz
+      terrain_pts[lz+1].x = terrain_pts[lz].x + 60;
+      terrain_pts[lz+1].y = terrain_pts[lz].y;
+
+      // Adjust terrain for lz  
+      for (var i = lz + 2; lz < terrain_pts - 1; i++) {
+        if (terrain_pts[i].x < terrain_pts[lz+1].x) {
+          terrain_pts[i].x += 70;
+        }
+      }
+      //Draw terrain segs
+      for (var i = 0; i < terrain_pts.length - 1; i++) {
+        terrain_obj.push(paper.path("M" + terrain_pts[i].x + " " + 
+              terrain_pts[i].y + "L" + terrain_pts[i+1].x + " " + 
+              terrain_pts[i+1].y).attr({stroke:"#FFFFFF", "stroke-width":8}));
+      }
+
+      terrain_obj[lz].attr({stroke:"#F52887"});
+     
+    }
+
+    function handleOrientation(orientData) { 
+      accelx = orientData.x;
+      accely = orientData.y;
+    }
+
+      
+    function deviceOrientation(orientData) { 
+      accelx = orientData.gamma/90;
+      accely = orientData.beta/90;
+    }
+
+    function Update(e) {
+      
+      //context.fillText(parseInt(ship.x) + ", " + parseInt(ship.y), 10, 10);
+      // Terrain collision detection
+      for (var i = 0; i < terrain_pts.length-1; i++) {
+
+        pt1 = terrain_pts[i];
+        pt2 = terrain_pts[i+1];
+
+        // pt dist to line func
+        var x = ship.x;
+        var y = ship.y+ship.size;
+        var x1 = pt1.x;
+        var y1 = pt1.y;
+        var x2 = pt2.x;
+        var y2 = pt2.y;
+
+        var A = x - x1;
+        var B = y - y1;
+        var C = x2 - x1;
+        var D = y2 - y1;
+        var param = (A * C + B * D) / (C * C + D * D);
+        var xx,yy;
+        if(param < 0){
+          xx = x1;
+          yy = y1;
+        }
+        else if(param > 1){
+
+          xx = x2;
+          yy = y2;
+        }else{
+          xx = x1 + param * C;
+          yy = y1 + param * D;
+        }
+        d = Math.sqrt((x -= xx) * x + (y -= yy) * y);
+
+
+        if (i === lz && d < 20){
+          alert("Win!");
+          resetEnv();
+        }
+        else if (d < 20) {
+										alert(getRandomInsult());
+          resetEnv();
+        }
+
+      }
+      
+      // Check boundaires and calc velocity
+      if (ship.x > MAX_WIDTH) {
+        ship.vx = 0;
+        ship.x = MAX_WIDTH - 1;
+      }
+      else if (ship.x < 0) {
+        ship.vx = 0;
+        ship.x = 1;
+      }
+      else {
+        ship.vx += accelx/2;
+      }
+      if (ship.y > MAX_HEIGHT) {
+        ship.vy = 0;
+        ship.y = MAX_HEIGHT - 1;
+      } else if (ship.y < 0) {
+        ship.vy = 0;
+        ship.y = 1;
+      } 
+      else if (accely > -0.1 && accely < 0.1){
+        ship.vy -= -0.1;  // gravity?
+      }
+      else {
+        ship.vy += accely/4;
+      }
+
+      // Assign next ship velocity
+      ship.x += ship.vx;
+      ship.y += ship.vy;
+
+      drawShip();
+    }
+
+
+    var currline = 1;
+    function debug(text) {
+      paper.print(10, currline*50, text, paper.getFont("Helvetica"), 30).attr({fill: "none", stroke: "#fff"});
+      currline++;
+      
+
+    }
+
+  </script>
+
+
+
+</body></html>

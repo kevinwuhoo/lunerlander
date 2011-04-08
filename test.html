@@ -1,0 +1,91 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Multi Mouse - How many mice can I mouse eater eat?</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script> <!-- jquery -->
+    <script src="/json.js"></script> <!-- for ie -->
+    <script src="socket.io/socket.io.js"></script> <!-- sockets -->
+  </head>
+  <body>
+<h1> You can see my mouse!! ZOMG - <a href="http://www.youtube.com/watch?v=aFLcbBvTGns">Video explaining why I'm doign this</a></h1>    
+
+    <script>
+
+// some random color
+function randc(){
+colors = new Array('#FF0000','#00FF00','#0000FF','#00FFFF','#FF00FF','#C0C0C0');
+var color = colors[Math.floor(Math.random()*colors.length)]
+return color;
+}
+
+// When a new message arrives..
+      function message(obj){
+	var data = obj.message[1].split(':');
+	var x = data[0];
+	var y = data[1];
+        var userid = obj.message[0];
+
+  if($('#mouse_'+userid).length == 0 && userid != 'you') {
+	var randcolor = randc();
+	$('body').append('<div class="dot" style="background-color:'+randcolor+'" id="mouse_'+userid+'"/>'
+    );
+  }
+
+// stops a dot being drawn for local user
+if (userid != 'you'){
+   $('#mouse_'+userid).css({
+    'left' : x + 'px',
+    'top' : y + 'px'
+  })
+}
+        var el = document.createElement('p');
+        if ('announcement' in obj) el.innerHTML = '<em>' + esc(obj.announcement) + '</em>';
+        else if ('message' in obj) el.innerHTML = '<b>' + esc(obj.message[0]) + ':</b> ' + esc(obj.message[1]);
+        document.getElementById('chat').appendChild(el);
+        document.getElementById('chat').scrollTop = 1000000;
+      }
+
+// A function to define how we send data
+      function send(){
+        var val = document.getElementById('text').value;
+        socket.send(val);
+        message({ message: ['you', val] });
+        document.getElementById('text').value = '';
+      }
+
+// When a mouse is moved
+      window.onmousemove = function(event){
+	 message({ message: ['you', event.clientX+':'+event.clientY] });
+         socket.send(event.clientX+':'+event.clientY);
+      };
+
+// replace <&> w/ &lt&&gt
+      function esc(msg){
+        return msg.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      };
+
+// establish the socket connection
+      var socket = new io.Socket(null, {port: 8080, rememberTransport: false});
+      socket.connect();
+      socket.on('message', function(obj){
+        if ('buffer' in obj){
+          document.getElementById('form').style.display='none';
+          document.getElementById('chat').innerHTML = '';
+
+          for (var i in obj.buffer) message(obj.buffer[i]);
+        } else message(obj);
+      });
+    </script>
+
+    <div id="chat"><p>Connecting...</p></div>
+    <form id="form" onsubmit="send(); return false">
+      <input type="text" autocomplete="off" id="text"><input type="submit" value="Send">
+    </form>
+
+    <style>
+      .dot { height: 10px; width: 10px; background-color:#000000;position:absolute;left:0;top:0;}
+    </style>
+
+  </body>
+</html>
+

@@ -1,0 +1,97 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Lunar Lander</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script> <!-- jquery -->
+    <script src="/json.js"></script> <!-- for ie -->
+    <script src="socket.io/socket.io.js"></script> <!-- sockets -->
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.0a4.1/jquery.mobile-1.0a4.1.min.css" />
+	<script type="text/javascript" src="http://code.jquery.com/jquery-1.5.2.min.js"></script>
+	<script type="text/javascript" src="http://code.jquery.com/mobile/1.0a4.1/jquery.mobile-1.0a4.1.min.js"></script>
+	<link href='http://fonts.googleapis.com/css?family=Terminal+Dosis+Light' rel='stylesheet' type='text/css'>
+	<style type="text/css">
+	body{
+		text-align: center;
+		
+	}
+	</style>
+  </head>
+
+<body>
+    <script>
+	var ori_x = 0;
+	var ori_y = 0;
+	var name = "poop";
+	
+	function handleOrientation(orientData) { 
+		ori_x = orientData.x;
+		ori_y = orientData.y;
+    }
+
+
+    function deviceOrientation(orientData) { 
+		ori_x = orientData.gamma/90;
+		ori_y = orientData.beta/90;
+    }
+
+	function sendOrientation(){
+		socket.send(ori_x+':'+ori_y);
+	}
+
+	window.addEventListener("MozOrientation", handleOrientation, true);
+    window.addEventListener("deviceorientation", deviceOrientation, true);
+	setInterval( sendOrientation, 100 );
+
+	// some random color
+	function randc(){
+	colors = new Array('#FF0000','#00FF00','#0000FF','#00FFFF','#FF00FF','#C0C0C0');
+	var color = colors[Math.floor(Math.random()*colors.length)]
+	return color;
+	}
+
+	// When a new message arrives..
+	function message(obj){
+		var data = obj.message[1].split(':');
+		var x = data[0];
+		var y = data[1];
+	    var userid = obj.message[0];
+	
+		var txtbox = document.getElementById("textarea");
+		var val = txtbox.value;
+		txtbox.value = x + ":" + y + "\n" + val;
+		
+	}
+
+	function esc(msg){
+		return msg.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+	};
+
+	// establish the socket connection
+	var socket = new io.Socket(null, {port: 8080, rememberTransport: false});
+	socket.connect();
+	socket.on('message', function(obj){
+	if ('buffer' in obj){
+		document.getElementById('form').style.display='none';
+		document.getElementById('chat').innerHTML = '';
+	} else message(obj);
+	});
+	</script>
+
+	<div data-role="page" data-theme="a">
+
+		<div data-role="content">
+			<textarea cols="40" rows="8" name="textarea" id="textarea" style="max-width: 400px; min-height: 400px; max-height:400px; overflow:hidden;"></textarea>
+			<br/>
+			<img style="margin-top:50px" src="http://www.w3.org/html/logo/badge/html5-badge-h-solo.png" width="63" height="64" alt="HTML5 Powered" title="HTML5 Powered">
+			<br/><p style="font-size: small;">HTML 5 Powered</p>
+		</div><!-- /content -->
+	</div><!-- /page -->
+	</body>
+
+    <div id="chat"><p>Connecting...</p></div>
+    <form id="form" onsubmit="send(); return false">
+    	<input type="text" autocomplete="off" id="text"><input type="submit" value="Send">
+    </form>
+
+  </body>
+</html>

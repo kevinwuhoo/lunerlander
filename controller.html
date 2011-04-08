@@ -12,7 +12,10 @@
 	<style type="text/css">
 	body{
 		text-align: center;
-		
+		font-family: 'Terminal Dosis Light', arial, serif; 
+	}
+	p{
+		font-family: 'Terminal Dosis Light', arial, serif; 
 	}
 	</style>
   </head>
@@ -35,19 +38,12 @@
     }
 
 	function sendOrientation(){
-		socket.send(ori_x+':'+ori_y);
+		socket.send(ori_x+':'+ori_y+':'+name);
 	}
 
 	window.addEventListener("MozOrientation", handleOrientation, true);
     window.addEventListener("deviceorientation", deviceOrientation, true);
 	setInterval( sendOrientation, 100 );
-
-	// some random color
-	function randc(){
-	colors = new Array('#FF0000','#00FF00','#0000FF','#00FFFF','#FF00FF','#C0C0C0');
-	var color = colors[Math.floor(Math.random()*colors.length)]
-	return color;
-	}
 
 	// When a new message arrives..
 	function message(obj){
@@ -57,9 +53,16 @@
 	    var userid = obj.message[0];
 	
 		if(x == "insult"){
+			name = data[2];
 			var txtbox = document.getElementById("textarea");
 			var val = txtbox.value;
-			txtbox.value = y + "\n" + val;
+			txtbox.value = name + " says \"" + y + "\"\n\n" + val;
+		}
+		if(x == "crash"){
+			name = data[2];
+			var txtbox = document.getElementById("textarea");
+			var val = txtbox.value;
+			txtbox.value = name + " just crashed! \n\n" + val;
 		}
 	}
 
@@ -83,7 +86,7 @@
 		<div data-role="content">
 			<textarea cols="40" rows="8" name="textarea" id="textarea" style="max-width: 400px; min-height: 400px; max-height:400px; overflow:hidden;"></textarea>
 			<br/>
-			<img style="margin-top:50px" src="http://www.w3.org/html/logo/badge/html5-badge-h-solo.png" width="63" height="64" alt="HTML5 Powered" title="HTML5 Powered">
+			<img style="margin-top:50px" src="http://fishgills.co.uk/images/beta_sticker.png" width="63" height="64" alt="HTML5 Powered" title="HTML5 Powered">
 			<br/><p style="font-size: small;">HTML 5 Powered</p>
 		</div><!-- /content -->
 	</div><!-- /page -->

@@ -57,6 +57,7 @@
                 for (var key in ships) {
                     if (key === 'length' || !ships.hasOwnProperty(key)) continue;
                     var ship = ships[key];
+                    color_temp = ships[key].color;
                     twitter_temp = ships[key].twitter;
                     ships[key] = ({
                         x: Math.random() * MAX_WIDTH,
@@ -76,7 +77,6 @@
                         size: 40,
                         accelx: 0,
                         accely: 0,
-		                color: "#FFFFFF",
 		                ship_obj: "null",
 		                ship_path: "null",
 		                ship_flame_arr: "null",
@@ -84,7 +84,8 @@
 		                ship_flame_obj: "null",
 		                twitter: twitter_temp,
 		                pic: paper.image(getIcon(twitter_temp), 0, 0, 30, 30),
-		                dead: 0
+		                dead: 0,
+		                color: color_temp
                     });
 
                 }
@@ -106,7 +107,7 @@
                 if (ships[key].ship_obj == "null") {
                     ships[key].ship_obj = paper.path(ships[key].ship_path).attr({
                         stroke: "#FFFFFF",
-                        fill: "#00FFFF",
+                        fill: ships[key].color,
                         "stroke-width": 6
                     });
                 } else {
@@ -200,13 +201,14 @@
                     }));
                 }
 
+                // Color landing zone
                 terrain_obj[lz].attr({
                     stroke: "#F52887"
                 });
                 // Show stock price
-                setTimeout("ticker = paper.text(-50, 580, \"YHOO: \" + getPrice()).attr({font: '20px \"Helvetica Neue\", Arial', fill: \"#FFF\", stroke: \"#FFF\"})", 500);
+                //setTimeout("ticker = paper.text(-50, 580, \"YHOO: \" + getPrice()).attr({font: '20px \"Helvetica Neue\", Arial', fill: \"#FFF\", stroke: \"#FFF\"})", 500);
                 // Show stock price
-                setTimeout("ticker.animate({x: MAX_WIDTH + 100}, 100000)", 550);
+                //setTimeout("ticker.animate({x: MAX_WIDTH + 100}, 100000)", 550);
 
             }
 
@@ -309,6 +311,15 @@
                 currline++;
             }
 
+			function get_random_color() {
+			    var letters = '0123456789ABCDEF'.split('');
+			    var color = '#';
+			    for (var i = 0; i < 6; i++ ) {
+			        color += letters[Math.round(Math.random() * 15)];
+			    }
+			    return color;
+			}
+
             function message(obj) {
                 var data = obj.message[1].split(':');
                 var x = data[0];
@@ -344,7 +355,6 @@
 		                size: 40,
 		                accelx: 0,
 		                accely: 0,
-		                color: "#FFFFFF",
 		                ship_obj: "null",
 		                ship_path: "null",
 		                ship_flame_arr: "null",
@@ -352,7 +362,8 @@
 		                ship_flame_obj: "null",
 		                twitter: twitter_name,
 		                pic: paper.image(getIcon(twitter_name), 0, 0, 30, 30),
-                        dead: 0
+                        dead: 0,
+                        color: get_random_color()
 		            });
 				}
 				

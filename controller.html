@@ -30,13 +30,13 @@
 	  var regexS = "[\\?&]"+name+"=([^&#]*)";
 	  var regex = new RegExp( regexS );
 	  var results = regex.exec( window.location.href );
-	  if( results == null )
-	    return "";
+	  if( results[1] == '' )
+	    return "reddit";
 	  else
 	    return results[1];
 	}
 	
-	//alert(getParam());
+	//alert("||"+getParam()+"||");
 
 	var ori_x = 0;
 	var ori_y = 0;

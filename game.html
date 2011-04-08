@@ -22,7 +22,7 @@
 			}
         </style>
         <title>
-            Ghetto Wii
+            Lunar Landing
         </title>
     </head>
     
@@ -60,43 +60,46 @@
                 terrain_pts = [];
                 terrain_obj = [];
                 particles = [];
-                lz = Math.floor(Math.random() * PEAK_NUM + 1);
+                lz = Math.floor(Math.random() * PEAK_NUM);
 
                 for (var key in ships) {
-                    if (key === 'length' || !ships.hasOwnProperty(key)) continue;
-					if(key != undefined){
-	                    var ship = ships[key];
-	                    color_temp = ships[key].color;
-	                    twitter_temp = ships[key].twitter;
-	                    ships[key] = ({
-	                        x: Math.random() * MAX_WIDTH,
-	                        y: MAX_HEIGHT - MAX_HEIGHT * (7 / 8),
-	                        t_ptx: 0,
-	                        t_pty: 0,
-	                        r_ptx: 0,
-	                        r_pty: 0,
-	                        l_ptx: 0,
-	                        l_pty: 0,
-	                        flame_l: 0,
-	                        flame_r: 0,
-	                        flame_width: 0,
-	                        flame_height: 0,
-	                        vx: 0,
-	                        vy: 0,
-	                        size: 40,
-	                        accelx: 0,
-	                        accely: 0,
-			                ship_obj: "null",
-			                ship_path: "null",
-			                ship_flame_arr: "null",
-			                ship_flame_path: "null",
-			                ship_flame_obj: "null",
-			                twitter: twitter_temp,
-			                pic: paper.image(getIcon(twitter_temp), 0, 0, 30, 30),
-			                dead: 0,
-			                color: color_temp
-	                    });
+					
+					if(key == "undefined"){
+						delete ships[key];
 					}
+	
+                    if (key === 'length' || !ships.hasOwnProperty(key)) continue;
+                    var ship = ships[key];
+                    color_temp = ships[key].color;
+                    twitter_temp = ships[key].twitter;
+                    ships[key] = ({
+                        x: Math.random() * MAX_WIDTH,
+                        y: MAX_HEIGHT - MAX_HEIGHT * (7 / 8),
+                        t_ptx: 0,
+                        t_pty: 0,
+                        r_ptx: 0,
+                        r_pty: 0,
+                        l_ptx: 0,
+                        l_pty: 0,
+                        flame_l: 0,
+                        flame_r: 0,
+                        flame_width: 0,
+                        flame_height: 0,
+                        vx: 0,
+                        vy: 0,
+                        size: 40,
+                        accelx: 0,
+                        accely: 0,
+		                ship_obj: "null",
+		                ship_path: "null",
+		                ship_flame_arr: "null",
+		                ship_flame_path: "null",
+		                ship_flame_obj: "null",
+		                twitter: twitter_temp,
+		                pic: paper.image(getIcon(twitter_temp), 0, 0, 30, 30),
+		                dead: 0,
+		                color: color_temp
+                    });
 
                 }
 
@@ -118,11 +121,11 @@
                     ships[key].ship_obj = paper.path(ships[key].ship_path).attr({
                         stroke: "#FFFFFF",
                         fill: ships[key].color,
-                        "stroke-width": 6
+                        "stroke-width": 4
                     });
                 } else {
                     ships[key].ship_obj.animate({ path: ships[key].ship_path }, 10);
-                    ships[key].pic.animate({ x: ships[key].x - 15, y: ships[key].y - 15 }, 10);
+                    ships[key].pic.animate({ x: ships[key].x - 15, y: ships[key].y + 7 }, 10);
                 }
                 ships[key].pic.toFront();
 
@@ -136,7 +139,7 @@
                     for (var i = 0; i < 5; i++) {
                         ships[key].ship_flame_arr.push({
                             x: Math.abs(Math.random()) * ships[key].flame_width + ships[key].flame_l,
-                            y: Math.abs(Math.random()) * ships[key].flame_height + ships[key].y + 25
+                            y: Math.abs(Math.random()) * ships[key].flame_height + ships[key].y * (6/5)
                         });
                         //	y: Math.abs(Math.random())*ships[key].flame_height + ships[key].y*(3/2)});	//ships[key].y changes
                     }
@@ -200,14 +203,14 @@
                 // Adjust terrain for lz  
                 for (var i = lz + 2; lz < terrain_pts - 1; i++) {
                     if (terrain_pts[i].x < terrain_pts[lz + 1].x) {
-                        terrain_pts[i].x += 70;
+                        terrain_pts[i].x = terrain_pts[lz + 1].x + 20;
                     }
                 }
                 //Draw terrain segs
                 for (var i = 0; i < terrain_pts.length - 1; i++) {
                     terrain_obj.push(paper.path("M" + terrain_pts[i].x + " " + terrain_pts[i].y + "L" + terrain_pts[i + 1].x + " " + terrain_pts[i + 1].y).attr({
                         stroke: "#FFFFFF",
-                        "stroke-width": 8
+                        "stroke-width": 5
                     }));
                 }
 
@@ -216,9 +219,9 @@
                     stroke: "#F52887"
                 });
                 // Show stock price
-                //setTimeout("ticker = paper.text(-50, 580, \"YHOO: \" + getPrice()).attr({font: '20px \"Helvetica Neue\", Arial', fill: \"#FFF\", stroke: \"#FFF\"})", 500);
+                setTimeout("ticker = paper.text(180, 680, \"Current Yahoo! Stock: \" + getPrice()).attr({font: '20px \"Courier\", Arial', fill: \"#FA6900\", stroke: \"#FA6900\"})", 500);
                 // Show stock price
-                //setTimeout("ticker.animate({x: MAX_WIDTH + 100}, 100000)", 550);
+                //setTimeout("ticker.animate({x: MAX_WIDTH + 100}, 100000)", 800);
 
             }
 
@@ -226,6 +229,7 @@
             function Update(e) {
 				var flag = 0;
                 for (var key in ships) {
+					if(key != undefined);
                     //if (key === 'length' || !ships.hasOwnProperty(key)) continue;
                     //var ship = ships[key];
 
@@ -345,8 +349,8 @@
                     }
 
 
-                }
-
+                	}
+				
             	if(flag == 0){
 					resetEnv();
 				}

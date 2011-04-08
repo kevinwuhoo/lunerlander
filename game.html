@@ -1,360 +1,375 @@
 <!DOCTYPE html>
 <html>
-	
-	<head>
-		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js" type="text/javascript">
-		</script>
-		<script src="raphael.js" type="text/javascript">
-		</script>
-		<script src="insult.js" type="text/javascript">
-		</script>
-		<script src="socket.io/socket.io.js" type="text/javascript">
-		</script>
-		<style type="text/css">
-			body { height:100% ; background-color: #000; }
-		</style>
-		<title>
-			Ghetto Wii
-		</title>
-	</head>
-	
-	<body>
-		<div id="drawme" class="fullscreen">
-		</div>
-		<script type="text/javascript">
-			// Constants
-			var SMOKE_LEN = 40;
-			var PEAK_NUM = 20;
-			var PEAK_SCALE = 0.60;
-			var MAX_WIDTH = 1000;
-			var MAX_HEIGHT = 600;
+    
+    <head>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js" type="text/javascript">
+        </script>
+        <script src="raphael.js" type="text/javascript">
+        </script>
+        <script src="insult.js" type="text/javascript">
+        </script>
+        <script src="socket.io/socket.io.js" type="text/javascript">
+        </script>
+        <style type="text/css">
+            body { height:100% ; background-color: #000; }
+        </style>
+        <title>
+            Ghetto Wii
+        </title>
+    </head>
+    
+    <body>
+        <div id="drawme" class="fullscreen">
+        </div>
+        <script type="text/javascript">
+            // Constants
+            var SMOKE_LEN = 40;
+            var PEAK_NUM = 20;
+            var PEAK_SCALE = 0.60;
+            var MAX_WIDTH = 1100;
+            var MAX_HEIGHT = 700;
 
-			var paper = Raphael(document.getElementById("drawme"), MAX_WIDTH, MAX_HEIGHT);
-			var ships = new Array();
-			var ship_obj;
-			var ship_flame_obj;
-			var terrain_pts;
-			var terrain_obj;
-			//var h = Math.random();
-			var lz;
-			var pic;
-			var ticker;
+            var paper = Raphael(document.getElementById("drawme"), MAX_WIDTH, MAX_HEIGHT);
+            var ships = new Array();
+            //var ship_obj;
+            //var ship_flame_obj;
+            var terrain_pts;
+            var terrain_obj;
+            //var h = Math.random();
+            var lz;
+            var pic;
+            var ticker;
+            var deadCtr = 0;
 
-			// Start code
-			resetEnv();
-			//window.addEventListener("MozOrientation", handleOrientation, true);
-			//window.addEventListener("deviceorientation", deviceOrientation, true);
-			setInterval(Update, 20);
+            // Start code
+            resetEnv();
+            //window.addEventListener("MozOrientation", handleOrientation, true);
+            //window.addEventListener("deviceorientation", deviceOrientation, true);
+            setInterval(Update, 40);
 
-			function resetEnv() {
-				paper.clear();
-				terrain_pts = [];
-				terrain_obj = [];
-				particles = [];
-				lz = Math.floor(Math.random() * PEAK_NUM + 1);
+            function resetEnv() {
+                paper.clear();
+                terrain_pts = [];
+                terrain_obj = [];
+                particles = [];
+                lz = Math.floor(Math.random() * PEAK_NUM + 1);
 
-				ships[0] = ({
-					x: Math.random() * MAX_WIDTH,
-					y: MAX_HEIGHT - MAX_HEIGHT * (7 / 8),
-					t_ptx: 0,
-					t_pty: 0,
-					r_ptx: 0,
-					r_pty: 0,
-					l_ptx: 0,
-					l_pty: 0,
-					flame_l: 0,
-					flame_r: 0,
-					flame_width: 0,
-					flame_height: 0,
-					vx: 0,
-					vy: 0,
-					size: 40,
-					accelx: 0,
-					accely: 0,
-					color: "#FFFFFF"
-				});
-				//// Reset ship
-/*ship = ( { x: Math.random() * MAX_WIDTH, 
-				 y: MAX_HEIGHT - MAX_HEIGHT *(7/8), 
-				 t_ptx: 0,
-				 t_pty: 0,
-				 r_ptx: 0,
-				 r_pty: 0,
-				 l_ptx: 0,
-				 l_pty: 0,
-				 flame_l: 0,
-				 flame_r: 0,
-				 flame_width: 0,
-				 flame_height: 0,
-				 vx: 0,
-				 vy: 0,
-				 size: 40,
-				 color: "#FFFFFF" 
-			   } );
-			*/
+                for (var key in ships) {
+                    if (key === 'length' || !ships.hasOwnProperty(key)) continue;
+                    var ship = ships[key];
+                    twitter_temp = ships[key].twitter;
+                    ships[key] = ({
+                        x: Math.random() * MAX_WIDTH,
+                        y: MAX_HEIGHT - MAX_HEIGHT * (7 / 8),
+                        t_ptx: 0,
+                        t_pty: 0,
+                        r_ptx: 0,
+                        r_pty: 0,
+                        l_ptx: 0,
+                        l_pty: 0,
+                        flame_l: 0,
+                        flame_r: 0,
+                        flame_width: 0,
+                        flame_height: 0,
+                        vx: 0,
+                        vy: 0,
+                        size: 40,
+                        accelx: 0,
+                        accely: 0,
+		                color: "#FFFFFF",
+		                ship_obj: "null",
+		                ship_path: "null",
+		                ship_flame_arr: "null",
+		                ship_flame_path: "null",
+		                ship_flame_obj: "null",
+		                twitter: twitter_temp,
+		                pic: paper.image(getIcon(twitter_temp), 0, 0, 30, 30),
+		                dead: 0
+                    });
+
+                }
+
+                drawTerrain();
+            }
+
+            function drawShip(key) {
+                //ship = ships[0];
+                ships[key].t_ptx = ships[key].x;
+                ships[key].t_pty = ships[key].y - ships[key].size;
+                ships[key].r_ptx = ships[key].x + ships[key].size / 3 * 2;
+                ships[key].r_pty = ships[key].y + ships[key].size;
+                ships[key].l_ptx = ships[key].x - ships[key].size / 3 * 2;
+                ships[key].l_pty = ships[key].y + ships[key].size;
+
+                ships[key].ship_path = "M" + ships[key].t_ptx + " " + ships[key].t_pty + "L" + ships[key].r_ptx + " " + ships[key].r_pty + "L" + ships[key].l_ptx + " " + ships[key].l_pty + "Z";
+
+                if (ships[key].ship_obj == "null") {
+                    ships[key].ship_obj = paper.path(ships[key].ship_path).attr({
+                        stroke: "#FFFFFF",
+                        fill: "#00FFFF",
+                        "stroke-width": 6
+                    });
+                } else {
+                    ships[key].ship_obj.animate({ path: ships[key].ship_path }, 10);
+                    ships[key].pic.animate({ x: ships[key].x - 15, y: ships[key].y - 15 }, 10);
+                }
+                ships[key].pic.toFront();
+
+                // If tilt up then add flame			
+                if (ships[key].accely < 0.1) {
+                    ships[key].ship_flame_arr = []
+                    ships[key].flame_l = ships[key].l_ptx - ships[key].size / 2;
+                    ships[key].flame_r = ships[key].r_ptx + ships[key].size / 2;
+                    ships[key].flame_width = ships[key].flame_r - ships[key].flame_l;
+                    ships[key].flame_height = ships[key].size;
+                    for (var i = 0; i < 5; i++) {
+                        ships[key].ship_flame_arr.push({
+                            x: Math.abs(Math.random()) * ships[key].flame_width + ships[key].flame_l,
+                            y: Math.abs(Math.random()) * ships[key].flame_height + ships[key].y + 25
+                        });
+                        //	y: Math.abs(Math.random())*ships[key].flame_height + ships[key].y*(3/2)});	//ships[key].y changes
+                    }
+                    ships[key].ship_flame_arr.sort(function(a, b) {
+                        return a.x - b.x
+                    });
+                    ships[key].ship_flame_path = "M" + ships[key].l_ptx + " " + ships[key].l_pty + 
+                                           "L" + ships[key].flame_l + " " + ships[key].ship_flame_arr[0].y + 
+                                           "L" + ships[key].ship_flame_arr[1].x + " " + ships[key].ship_flame_arr[1].y + 
+                                           "L" + ships[key].ship_flame_arr[2].x + " " + ships[key].ship_flame_arr[2].y + 
+                                           "L" + ships[key].ship_flame_arr[3].x + " " + ships[key].ship_flame_arr[3].y + 
+                                           "L" + ships[key].flame_r + " " + ships[key].ship_flame_arr[4].y + 
+                                           "L" + ships[key].r_ptx + " " + ships[key].r_pty + "Z";
+                    if (ships[key].ship_flame_obj == "null") {
+                        ships[key].ship_flame_obj = paper.path(ships[key].ship_flame_path).attr({
+                            stroke: "#FFFFFF",
+                            fill: "90-#FF3300-#FFFF33",
+                            "stroke-width": 2
+                        });
+                    } else {
+                        ships[key].ship_flame_obj.animate({ path: ships[key].ship_flame_path }, 10);
+                    }
 
 
-				drawTerrain();
+                }
+                // No tilt, remove flame
+                else {
+                    if (ships[key].ship_flame_obj != "null") {ships[key].ship_flame_obj.remove();}
+                    ships[key].ship_flame_obj = "null";
+                }
+            }
 
-				ship = ships[0];
+            function drawTerrain() {
 
-				ship_obj = null;
-				ship_flame_obj = null;
-				pic = paper.image(getIcon("kevinwuhoo"), ship.x, ship.y, 30, 30);
+                // Generate terrain points
+                for (var i = 0; i < PEAK_NUM; i++) {
+                    terrain_pts.push({
+                        x: Math.random() * MAX_WIDTH,
+                        y: MAX_HEIGHT - Math.abs(Math.random()) * MAX_HEIGHT * PEAK_SCALE
+                    });
+                }
+
+                // Generate endpoints
+                terrain_pts.push({
+                    x: 0,
+                    y: MAX_HEIGHT - Math.random() * MAX_HEIGHT * PEAK_SCALE
+                });
+                terrain_pts.push({
+                    x: MAX_WIDTH,
+                    y: MAX_HEIGHT - Math.random() * MAX_HEIGHT * PEAK_SCALE
+                });
+
+                terrain_pts.sort(function(a, b) {
+                    return a.x - b.x
+                });
+
+                //	Create lz
+                terrain_pts[lz + 1].x = terrain_pts[lz].x + 60;
+                terrain_pts[lz + 1].y = terrain_pts[lz].y;
+
+                // Adjust terrain for lz  
+                for (var i = lz + 2; lz < terrain_pts - 1; i++) {
+                    if (terrain_pts[i].x < terrain_pts[lz + 1].x) {
+                        terrain_pts[i].x += 70;
+                    }
+                }
+                //Draw terrain segs
+                for (var i = 0; i < terrain_pts.length - 1; i++) {
+                    terrain_obj.push(paper.path("M" + terrain_pts[i].x + " " + terrain_pts[i].y + "L" + terrain_pts[i + 1].x + " " + terrain_pts[i + 1].y).attr({
+                        stroke: "#FFFFFF",
+                        "stroke-width": 8
+                    }));
+                }
+
+                terrain_obj[lz].attr({
+                    stroke: "#F52887"
+                });
+                // Show stock price
+                setTimeout("ticker = paper.text(-50, 580, \"YHOO: \" + getPrice()).attr({font: '20px \"Helvetica Neue\", Arial', fill: \"#FFF\", stroke: \"#FFF\"})", 500);
+                // Show stock price
+                setTimeout("ticker.animate({x: MAX_WIDTH + 100}, 100000)", 550);
+
+            }
+
+
+            function Update(e) {
+				var flag = 0;
+                for (var key in ships) {
+                    //if (key === 'length' || !ships.hasOwnProperty(key)) continue;
+                    //var ship = ships[key];
+
+                    // Terrain collision detection
+                    for (var i = 0; i < terrain_pts.length - 1; i++) {
+
+                        pt1 = terrain_pts[i];
+                        pt2 = terrain_pts[i + 1];
+
+                        // pt dist to line func
+                        var x = ships[key].x;
+                        var y = ships[key].y + ships[key].size;
+                        var x1 = pt1.x;
+                        var y1 = pt1.y;
+                        var x2 = pt2.x;
+                        var y2 = pt2.y;
+
+                        var A = x - x1;
+                        var B = y - y1;
+                        var C = x2 - x1;
+                        var D = y2 - y1;
+                        var param = (A * C + B * D) / (C * C + D * D);
+                        var xx, yy;
+                        if (param < 0) {
+                            xx = x1;
+                            yy = y1;
+                        } else if (param > 1) {
+                            xx = x2;
+                            yy = y2;
+                        } else {
+                            xx = x1 + param * C;
+                            yy = y1 + param * D;
+                        }
+
+                        // d = distance from ship to current terrain seg
+                        d = Math.sqrt((x -= xx) * x + (y -= yy) * y);
+
+                        // Someone won
+                        if (i === lz && d < 5) {	                        
+	                        socket.send("insult" + ':' + getRandomInsult() + ':' + ships[key].twitter);
+                            resetEnv();
+                        }
+                        else if (d < 5) {
+                            //resetEnv()
+                            ships[key].dead = 1;
+                        }
+                    }
+                    // Check boundaires and calc velocity
+                    if (ships[key].x > MAX_WIDTH) {
+                        ships[key].vx = 0;
+                        ships[key].x = MAX_WIDTH - 1;
+                    } else if (ships[key].x < 0) {
+                        ships[key].vx = -ships[key].vx * 0.50;
+                        ships[key].x = 1;
+                    } else {
+                        ships[key].vx += ships[key].accelx / 2;
+                    }
+                    if (ships[key].y > MAX_HEIGHT) {
+                        ships[key].vy = -ships[key].vy * 0.50;
+                        ships[key].y = MAX_HEIGHT - 1;
+                    } else if (ships[key].y < 0) {
+                        ships[key].vy = 0;
+                        ships[key].y = 1;
+                    } else if (ships[key].accely > -0.1 && ships[key].accely < 0.1) {
+                        ships[key].vy += -0.1; // gravity?
+                    } else {
+                        ships[key].vy += ships[key].accely / 4;
+                    }
+
+                    if (ships[key].dead === 0) {
+                    // Assign next ship velocity
+                      ships[key].x += ships[key].vx;
+                      ships[key].y += ships[key].vy;
+                      drawShip(key);
+						flag = 1;
+                    }
+
+                }
+            	if(flag == 0){
+					resetEnv();
+				}
+
 			}
 
-			function drawShip() {
-				ship = ships[0];
-				ship.t_ptx = ship.x;
-				ship.t_pty = ship.y - ship.size;
-				ship.r_ptx = ship.x + ship.size / 3 * 2;
-				ship.r_pty = ship.y + ship.size;
-				ship.l_ptx = ship.x - ship.size / 3 * 2;
-				ship.l_pty = ship.y + ship.size;
-/*
-	  ship_path = "M" + ship.t_ptx + " " + ship.t_pty +
-				  "L" + ship.r_ptx + " " + ship.r_pty + 
-				  "L" + ship.l_ptx + " " + ship.l_pty + "Z";
-*/
+            var currline = 1;
 
-				var scale = 1.25;
+            function debug(text) {
+                paper.text(100, currline * 20, text).attr({
+                    font: '30px "Helvetica Neue", Arial',
+                    fill: "#FFF",
+                    stroke: "#FFF"
+                });
+                currline++;
+            }
 
-				ship_path = "M" + (ship.x) + " " + (ship.y - 25 * scale) + //body ship
-				"L" + (ship.x + 10 * scale) + " " + (ship.y) + "L" + (ship.x + 10 * scale) + " " + (ship.y + 25 * scale) + "L" + (ship.x - 10 * scale) + " " + (ship.y + 25 * scale) + "L" + (ship.x - 10 * scale) + " " + (ship.y) + "L" + (ship.x) + " " + (ship.y - 25 * scale) +
+            function message(obj) {
+                var data = obj.message[1].split(':');
+                var x = data[0];
+                var y = data[1];
+                var twitter_name = data[2];
+                var userid = obj.message[0];
 
-				"M" + (ship.x + 5 * scale) + " " + (ship.y + 10 * scale) + //right box
-				"L" + (ship.x + 15 * scale) + " " + (ship.y + 10 * scale) + "L" + (ship.x + 15 * scale) + " " + (ship.y + 30 * scale) + "L" + (ship.x + 5 * scale) + " " + (ship.y + 30 * scale) + "L" + (ship.x + 5 * scale) + " " + (ship.y + 10 * scale) +
-
-				"M" + (ship.x - 5 * scale) + " " + (ship.y + 10 * scale) + //left box 
-				"L" + (ship.x - 15 * scale) + " " + (ship.y + 10 * scale) + "L" + (ship.x - 15 * scale) + " " + (ship.y + 30 * scale) + "L" + (ship.x - 5 * scale) + " " + (ship.y + 30 * scale) + "L" + (ship.x - 5 * scale) + " " + (ship.y + 10 * scale) +
-
-				"M" + (ship.x - 10 * scale) + " " + (ship.y + 10 * scale) + //left wing
-				"L" + (ship.x - 20 * scale) + " " + (ship.y + 15 * scale) + "L" + (ship.x - 20 * scale) + " " + (ship.y + 20 * scale) + "L" + (ship.x - 10 * scale) + " " + (ship.y + 25 * scale) + "L" + (ship.x - 10 * scale) + " " + (ship.y + 10 * scale) +
-
-				"M" + (ship.x + 10 * scale) + " " + (ship.y + 10 * scale) + //right wing
-				"L" + (ship.x + 20 * scale) + " " + (ship.y + 15 * scale) + "L" + (ship.x + 20 * scale) + " " + (ship.y + 20 * scale) + "L" + (ship.x + 10 * scale) + " " + (ship.y + 25 * scale) + "L" + (ship.x + 10 * scale) + " " + (ship.y + 10 * scale) + "Z";
-
-				if (ship_obj == null) {
-					ship_obj = paper.path(ship_path).attr({
-						stroke: "#FFFFFF",
-						fill: "#00FFFF",
-						"stroke-width": 6
-					});
-				} else {
-					ship_obj.animate({
-						path: ship_path
-					}, 10);
-					pic.animate({
-						x: ship.x - 15,
-						y: ship.y - 15
-					}, 1);
-				}
-				pic.toFront();
-
-				// If tilt up then add flame			
-				if (ship.accely < 0.1) {
-					ship_flame_arr = []
-					ship.flame_l = ship.l_ptx - ship.size / 2;
-					ship.flame_r = ship.r_ptx + ship.size / 2;
-					ship.flame_width = ship.flame_r - ship.flame_l;
-					ship.flame_height = ship.size;
-					for (var i = 0; i < 5; i++) {
-						ship_flame_arr.push({
-							x: Math.abs(Math.random()) * ship.flame_width + ship.flame_l,
-							y: Math.abs(Math.random()) * ship.flame_height + ship.y + 25
-						});
-						//	y: Math.abs(Math.random())*ship.flame_height + ship.y*(3/2)});	//ship.y changes
-					}
-					ship_flame_arr.sort(function(a, b) {
-						return a.x - b.x
-					});
-					ship_flame_path = "M" + ship.l_ptx + " " + ship.l_pty + "L" + ship.flame_l + " " + ship_flame_arr[0].y + "L" + ship_flame_arr[1].x + " " + ship_flame_arr[1].y + "L" + ship_flame_arr[2].x + " " + ship_flame_arr[2].y + "L" + ship_flame_arr[3].x + " " + ship_flame_arr[3].y + "L" + ship.flame_r + " " + ship_flame_arr[4].y + "L" + ship.r_ptx + " " + ship.r_pty + "Z";
-					if (ship_flame_obj == null) {
-						ship_flame_obj = paper.path(ship_flame_path).attr({
-							stroke: "#FFFFFF",
-							fill: "90-#FF3300-#FFFF33",
-							"stroke-width": 2
-						});
-					} else {
-						ship_flame_obj.animate({
-							path: ship_flame_path
-						}, 10);
-					}
-
-
-				}
-				// No tilt, remove flame
-				else {
-					ship_flame_obj.remove();
-					ship_flame_obj = null;
-				}
-			}
-
-			function drawTerrain() {
-
-				// Generate terrain points
-				for (var i = 0; i < PEAK_NUM; i++) {
-					terrain_pts.push({
-						x: Math.random() * MAX_WIDTH,
-						y: MAX_HEIGHT - Math.abs(Math.random()) * MAX_HEIGHT * PEAK_SCALE
-					});
-				}
-
-				// Generate endpoints
-				terrain_pts.push({
-					x: 0,
-					y: MAX_HEIGHT - Math.random() * MAX_HEIGHT * PEAK_SCALE
-				});
-				terrain_pts.push({
-					x: MAX_WIDTH,
-					y: MAX_HEIGHT - Math.random() * MAX_HEIGHT * PEAK_SCALE
-				});
-
-				terrain_pts.sort(function(a, b) {
-					return a.x - b.x
-				});
-
-				//	Create lz
-				terrain_pts[lz + 1].x = terrain_pts[lz].x + 60;
-				terrain_pts[lz + 1].y = terrain_pts[lz].y;
-
-				// Adjust terrain for lz  
-				for (var i = lz + 2; lz < terrain_pts - 1; i++) {
-					if (terrain_pts[i].x < terrain_pts[lz + 1].x) {
-						terrain_pts[i].x += 70;
-					}
-				}
-				//Draw terrain segs
-				for (var i = 0; i < terrain_pts.length - 1; i++) {
-					terrain_obj.push(paper.path("M" + terrain_pts[i].x + " " + terrain_pts[i].y + "L" + terrain_pts[i + 1].x + " " + terrain_pts[i + 1].y).attr({
-						stroke: "#FFFFFF",
-						"stroke-width": 8
-					}));
-				}
-
-				terrain_obj[lz].attr({
-					stroke: "#F52887"
-				});
-				// Show stock price
-				setTimeout("ticker = paper.text(-50, 580, \"YHOO: \" + getPrice()).attr({font: '20px \"Helvetica Neue\", Arial', fill: \"#FFF\", stroke: \"#FFF\"})", 500);
-				// Show stock price
-				setTimeout("ticker.animate({x: MAX_WIDTH + 100}, 100000)", 550);
-
-			}
-
-
-			function Update(e) {
-
-				// Terrain collision detection
-				for (var i = 0; i < terrain_pts.length - 1; i++) {
-
-					pt1 = terrain_pts[i];
-					pt2 = terrain_pts[i + 1];
+				var inside = 0;
+				for (var key in ships) {
+                    if (key === 'length' || !ships.hasOwnProperty(key)) continue;
 					
-					for (var key in ships) {
-					    if (key === 'length' || !ships.hasOwnProperty(key)) continue;
-					    var ship = ships[key];
-
-						// pt dist to line func
-						var x = ship.x;
-						var y = ship.y + ship.size;
-						var x1 = pt1.x;
-						var y1 = pt1.y;
-						var x2 = pt2.x;
-						var y2 = pt2.y;
-
-						var A = x - x1;
-						var B = y - y1;
-						var C = x2 - x1;
-						var D = y2 - y1;
-						var param = (A * C + B * D) / (C * C + D * D);
-						var xx, yy;
-						if (param < 0) {
-							xx = x1;
-							yy = y1;
-						} else if (param > 1) {
-							xx = x2;
-							yy = y2;
-						} else {
-							xx = x1 + param * C;
-							yy = y1 + param * D;
-						}
-
-						// d = distance from ship to current terrain seg
-						d = Math.sqrt((x -= xx) * x + (y -= yy) * y);
-
-						if (i === lz && d < 5) {
-							//alert("Win!");
-							resetEnv();
-						} else if (d < 5) {
-							resetEnv();
-							socket.send("insult" + ':' + getRandomInsult() + ':' + "trash");
-						}
+					if(key == userid){
+						inside = 1;
 					}
 				}
-
-				// Check boundaires and calc velocity
-				if (ship.x > MAX_WIDTH) {
-					ship.vx = 0;
-					ship.x = MAX_WIDTH - 1;
-				} else if (ship.x < 0) {
-					ship.vx = -ship.vx * 0.50;
-					ship.x = 1;
-				} else {
-					ship.vx += ship.accelx / 2;
+				
+				if(inside == 0){
+					ships[userid] = ({
+		                x: Math.random() * MAX_WIDTH,
+		                y: MAX_HEIGHT - MAX_HEIGHT * (7 / 8),
+		                t_ptx: 0,
+		                t_pty: 0,
+		                r_ptx: 0,
+		                r_pty: 0,
+		                l_ptx: 0,
+		                l_pty: 0,
+		                flame_l: 0,
+		                flame_r: 0,
+		                flame_width: 0,
+		                flame_height: 0,
+		                vx: 0,
+		                vy: 0,
+		                size: 40,
+		                accelx: 0,
+		                accely: 0,
+		                color: "#FFFFFF",
+		                ship_obj: "null",
+		                ship_path: "null",
+		                ship_flame_arr: "null",
+		                ship_flame_path: "null",
+		                ship_flame_obj: "null",
+		                twitter: twitter_name,
+		                pic: paper.image(getIcon(twitter_name), 0, 0, 30, 30),
+                        dead: 0
+		            });
 				}
-				if (ship.y > MAX_HEIGHT) {
-					ship.vy = -ship.vy * 0.50;
-					ship.y = MAX_HEIGHT - 1;
-				} else if (ship.y < 0) {
-					ship.vy = 0;
-					ship.y = 1;
-				} else if (ship.accely > -0.1 && ship.accely < 0.1) {
-					ship.vy += -0.1; // gravity?
-				} else {
-					ship.vy += ship.accely / 4;
-				}
+				
+				ships[userid].accelx = x;
+				ships[userid].accely = y;
 
-				// Assign next ship velocity
-				ship.x += ship.vx;
-				ship.y += ship.vy;
+            }
 
-				drawShip();
-
-			}
-
-			var currline = 1;
-
-			function debug(text) {
-				paper.text(100, currline * 20, text).attr({
-					font: '30px "Helvetica Neue", Arial',
-					fill: "#FFF",
-					stroke: "#FFF"
-				});
-				currline++;
-			}
-
-			function message(obj) {
-				var data = obj.message[1].split(':');
-				var x = data[0];
-				var y = data[1];
-				var userid = obj.message[0];
-
-				var ship = ships[0];
-				ship.accelx = x;
-				ship.accely = y;
-
-			}
-
-			var socket = new io.Socket(null, {
-				port: 8080,
-				rememberTransport: false
-			});
-			socket.connect();
-			socket.on('message', function(obj) {
-				message(obj);
-			});
-		</script>
-	</body>
+            var socket = new io.Socket(null, {
+                port: 8080,
+                rememberTransport: false
+            });
+            socket.connect();
+            socket.on('message', function(obj) {
+                message(obj);
+            });
+        </script>
+    </body>
 
 </html>

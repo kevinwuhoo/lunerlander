@@ -11,7 +11,15 @@
         <script src="socket.io/socket.io.js" type="text/javascript">
         </script>
         <style type="text/css">
-            body { height:100% ; background-color: #000; }
+            body {
+				background: #000 url(http://demo.zeglin.co.uk/supercharged/img/page_bg_black_noise.jpg) no-repeat top center; 
+				height: 100%; 
+				font-family: Arial, Helvetica, sans-serif; 
+				color: #ccc;
+				width: 1100px ;
+			  	margin-left: auto ;
+			  	margin-right: auto ;
+			}
         </style>
         <title>
             Ghetto Wii
@@ -56,37 +64,39 @@
 
                 for (var key in ships) {
                     if (key === 'length' || !ships.hasOwnProperty(key)) continue;
-                    var ship = ships[key];
-                    color_temp = ships[key].color;
-                    twitter_temp = ships[key].twitter;
-                    ships[key] = ({
-                        x: Math.random() * MAX_WIDTH,
-                        y: MAX_HEIGHT - MAX_HEIGHT * (7 / 8),
-                        t_ptx: 0,
-                        t_pty: 0,
-                        r_ptx: 0,
-                        r_pty: 0,
-                        l_ptx: 0,
-                        l_pty: 0,
-                        flame_l: 0,
-                        flame_r: 0,
-                        flame_width: 0,
-                        flame_height: 0,
-                        vx: 0,
-                        vy: 0,
-                        size: 40,
-                        accelx: 0,
-                        accely: 0,
-		                ship_obj: "null",
-		                ship_path: "null",
-		                ship_flame_arr: "null",
-		                ship_flame_path: "null",
-		                ship_flame_obj: "null",
-		                twitter: twitter_temp,
-		                pic: paper.image(getIcon(twitter_temp), 0, 0, 30, 30),
-		                dead: 0,
-		                color: color_temp
-                    });
+					if(key != undefined){
+	                    var ship = ships[key];
+	                    color_temp = ships[key].color;
+	                    twitter_temp = ships[key].twitter;
+	                    ships[key] = ({
+	                        x: Math.random() * MAX_WIDTH,
+	                        y: MAX_HEIGHT - MAX_HEIGHT * (7 / 8),
+	                        t_ptx: 0,
+	                        t_pty: 0,
+	                        r_ptx: 0,
+	                        r_pty: 0,
+	                        l_ptx: 0,
+	                        l_pty: 0,
+	                        flame_l: 0,
+	                        flame_r: 0,
+	                        flame_width: 0,
+	                        flame_height: 0,
+	                        vx: 0,
+	                        vy: 0,
+	                        size: 40,
+	                        accelx: 0,
+	                        accely: 0,
+			                ship_obj: "null",
+			                ship_path: "null",
+			                ship_flame_arr: "null",
+			                ship_flame_path: "null",
+			                ship_flame_obj: "null",
+			                twitter: twitter_temp,
+			                pic: paper.image(getIcon(twitter_temp), 0, 0, 30, 30),
+			                dead: 0,
+			                color: color_temp
+	                    });
+					}
 
                 }
 
@@ -293,7 +303,50 @@
 						flag = 1;
                     }
 
+                    for (var key2 in ships) {
+
+	                  var d = 0;
+	                  d = Math.sqrt(Math.pow(ships[key].x-ships[key2].x, 2) + Math.pow(ships[key].y-ships[key2].y, 2));
+	                  if (d != 0 && d < 60) {
+                        ships[key].vx = -ships[key].vx * 1.5;
+                        ships[key].vy = -ships[key].vy * 1.5;
+                        ships[key2].vx = -ships[key2].vx * 1.5;
+                        ships[key2].vy = -ships[key2].vy * 1.5;
+
+                        if (ships[key].vx < -5) {
+	                      ships[key.vx] = -5;
+                        }
+                        if (ships[key].vx < 5) {
+	                      ships[key.vx] = 5;
+                        }
+                        if (ships[key].vy < -5) {
+	                      ships[key.vx] = -5;
+                        }
+                        if (ships[key].vy < 5) {
+	                      ships[key.vx] = -5;
+                        }
+
+                        if (ships[key2].vx < -5) {
+	                      ships[key.vx] = -5;
+                        }
+                        if (ships[key2].vx < 5) {
+	                      ships[key.vx] = 5;
+                        }
+                        if (ships[key2].vy < -5) {
+	                      ships[key.vx] = -5;
+                        }
+                        if (ships[key2].vy < 5) {
+	                      ships[key.vx] = -5;
+                        }
+
+	                  
+                    	}
+	                  
+                    }
+
+
                 }
+
             	if(flag == 0){
 					resetEnv();
 				}
@@ -303,7 +356,7 @@
             var currline = 1;
 
             function debug(text) {
-                paper.text(100, currline * 20, text).attr({
+                paper.text(300, currline * 20, text).attr({
                     font: '30px "Helvetica Neue", Arial',
                     fill: "#FFF",
                     stroke: "#FFF"

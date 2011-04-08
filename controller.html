@@ -56,10 +56,11 @@
 		var y = data[1];
 	    var userid = obj.message[0];
 	
-		var txtbox = document.getElementById("textarea");
-		var val = txtbox.value;
-		txtbox.value = x + ":" + y + "\n" + val;
-		
+		if(x == "insult"){
+			var txtbox = document.getElementById("textarea");
+			var val = txtbox.value;
+			txtbox.value = y + "\n" + val;
+		}
 	}
 
 	function esc(msg){
